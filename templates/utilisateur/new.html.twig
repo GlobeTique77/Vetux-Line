@@ -1,0 +1,28 @@
+{% extends 'userbase.html.twig' %}
+
+{% block title %}Nouvel Utilisateur{% endblock %}
+
+{% block body %}
+    <h1>Création d’un utilisateur</h1>
+
+    {{ form_start(form, {'attr': {'id': 'new_edit_utilisateur'}}) }}
+    {# utilisation de classes bootstrap pour la mise en forme #}
+    <div class="row">
+        <div class="col-12">
+            {{ form_label(form.username) }}
+            {{ form_widget(form.username) }}
+        </div>
+        <div class="col-12">
+            {{ form_label(form.password) }}
+            {{ form_widget(form.password) }}
+        </div>
+        <div class="col-12">
+            <label for="verifpass">Saisir une seconde fois le mot de passe</label>
+            <input type="password" id="verifpass" required>
+        </div>
+    </div>
+    <button class="btn btn-success">{{ button_label|default('Save') }}</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('utilisateur_index') }}">retour à la liste</a>
+{% endblock %}
