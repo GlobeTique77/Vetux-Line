@@ -51,4 +51,95 @@ class UploadController extends AbstractController
         return new Response("File uploaded",  Response::HTTP_OK,
             ['content-type' => 'text/plain']);
     }
+
+    /**
+     * @Route("/test1", name="test-fusion-seq")
+     * @param Request $request
+     * @param string $uploadDir
+     * @param FileUploader $uploader
+     * @param LoggerInterface $logger
+     * @return Response
+     */
+    public function sequentiel(Request $request, string $uploadDir,
+                          FileUploader $uploader, LoggerInterface $logger): Response
+    {
+        $handle1 = fopen("../var/uploads/small-french-data.csv", "r");
+        $handle2 = fopen("../var/uploads/small-german-data.csv", "r");
+        $fusion = "../var/uploads/test1.csv";
+        $fp = fopen($fusion, 'wb');
+        $liste = array();
+        if($handle1){
+            $ligne1 = fgetcsv($handle1, 1000, ",");
+            if($handle2) {
+                $ligne2 = fgetcsv($handle2, 1000, ",");  //skip 1ere ligne
+                $ligne2 = fgetcsv($handle2, 1000, ",");
+                while ($ligne1) {
+                    $liste[] = $ligne1;
+                    $ligne1 = fgetcsv($handle1, 1000, ",");
+                }
+
+                while ($ligne2){
+                    $liste[] = $ligne2;
+                    $ligne2 = fgetcsv($handle2, 1000, ",");
+                }
+                fclose($handle1);
+                fclose($handle2);
+            }else{
+                echo "Ouverture fichier 2 impossible !";
+            }
+        }else{
+            echo "Ouverture fichier 1 impossible !";
+        }
+        foreach ($liste as $fields) {
+            fputcsv($fp, $fields);
+        }
+        fclose($fp);
+        dump($liste);
+        exit;
+    }
+
+    /**
+     * @Route("/test2", name="test-fusion-entre")
+     * @param Request $request
+     * @param string $uploadDir
+     * @param FileUploader $uploader
+     * @param LoggerInterface $logger
+     * @return Response
+     */
+    public function entrelace(Request $request, string $uploadDir,
+                               FileUploader $uploader, LoggerInterface $logger): Response
+    {
+        $handle1 = fopen("../var/uploads/small-french-data.csv", "r");
+        $handle2 = fopen("../var/uploads/small-german-data.csv", "r");
+        $fusion = "../var/uploads/test2.csv";
+        $fp = fopen($fusion, 'wb');
+        $liste = array();
+        if($handle1){
+            $ligne1 = fgetcsv($handle1, 1000, ",");
+            if($handle2) {
+                $ligne2 = fgetcsv($handle2, 1000, ","); //skip 1ere ligne
+                $ligne2 = fgetcsv($handle2, 1000, ",");
+                while ($ligne1 || $ligne2) {
+                    if ($ligne1) {
+                        $liste[] = $ligne1;
+                        $ligne1 = fgetcsv($handle1, 1000, ",");
+                    }
+                    if ($ligne2) {
+                        $liste[] = $ligne2;
+                        $ligne2 = fgetcsv($handle2, 1000, ",");
+                    }
+                }
+                fclose($handle1);
+                fclose($handle2);
+            }else{
+                echo "Ouverture fichier 2 impossible !";            }
+        }else{
+            echo "Ouverture fichier 1 impossible !";        }
+        foreach ($liste as $fields) {
+            fputcsv($fp, $fields);
+        }
+        fclose($fp);
+        dump($liste);
+        exit;
+    }
 }
