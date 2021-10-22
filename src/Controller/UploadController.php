@@ -213,4 +213,52 @@ class UploadController extends AbstractController
         }
         return $liste;
     }
+    /**
+     * @Route("/test4", name="test-colone")
+     * @param Request $request
+     * @param string $uploadDir
+     * @param FileUploader $uploader
+     * @param LoggerInterface $logger
+     * @return Response
+     */
+    public function projection(Request $request, string $uploadDir,
+                              FileUploader $uploader, LoggerInterface $logger): Response
+    {
+        $handle1 = fopen("../var/uploads/small-french-data.csv", "r");
+        $fusion = "../var/uploads/test3.csv";
+        $fp = fopen($fusion, 'wb');
+        $liste = array();
+        $save = array('Number', 'Title', 'GivenName', 'Surname', 'EmailAddress', 'Birthday', 'TelephoneNumber', 'CCType', 'CCNumber', 'CVV2', 'CCExpires', 'StreetAddress', 'City', 'StateFull', 'ZipCode', 'CountryFull', 'Centimeters', 'Kilograms', 'Vehicle', 'Latitude', 'Longitude');
+        $raw = 0;
+        $garde = array();
+        if($handle1) {
+            $ligne1 = fgetcsv($handle1, 1000, ",");
+            foreach ($ligne1 as $item) {
+                if (in_array($item, $save)){
+                    $garde[] = $raw;
+                }
+                $raw++;
+            }
+        }
+            while ($ligne1) {
+                $raw = 0;
+                foreach ($ligne1 as $test) {
+                    if (in_array($raw, $garde)) {
+                        $liste[] = $test;
+                    }
+                $raw++;
+                }
+                $listefinal[] = $liste;
+                $liste = array();
+            $ligne1 = fgetcsv($handle1, 1000, ",");
+            }
+            foreach ($listefinal as $field) {
+                fputcsv($fp, $field);
+            }
+
+
+        dump($listefinal);
+        exit;
+    }
+
 }
