@@ -150,7 +150,7 @@ class UploadController extends AbstractController
      * @param LoggerInterface $logger
      * @return Response
      */
-    public function selection(Request $request, string $uploadDir,
+    public function projection(Request $request, string $uploadDir,
                               FileUploader $uploader, LoggerInterface $logger): Response
     {
         $handle1 = fopen("../var/uploads/small-french-data.csv", "r");
