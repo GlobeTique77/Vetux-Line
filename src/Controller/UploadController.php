@@ -143,7 +143,7 @@ class UploadController extends AbstractController
         exit;
     }
     /**
-     * @Route("/test3", name="test-colone")
+     * @Route("/test4", name="test-colone")
      * @param Request $request
      * @param string $uploadDir
      * @param FileUploader $uploader
