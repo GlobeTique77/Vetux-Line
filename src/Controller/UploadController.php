@@ -42,12 +42,10 @@ class UploadController extends AbstractController
         foreach ($files as $file)
         {
             $filetype = $file->getMimeType();
-            dump($filetype);
 
             $filename = $file->getClientOriginalName();
             $uploader->upload($uploadDir, $file, $filename);
         }
-        exit;
         return new Response("File uploaded",  Response::HTTP_OK,
             ['content-type' => 'text/plain']);
     }
@@ -135,11 +133,84 @@ class UploadController extends AbstractController
                 echo "Ouverture fichier 2 impossible !";            }
         }else{
             echo "Ouverture fichier 1 impossible !";        }
+        $liste = $this->selection($liste);
         foreach ($liste as $fields) {
             fputcsv($fp, $fields);
         }
         fclose($fp);
-        dump($liste);
-        exit;
+
+        return $this->file($fusion);
+
+        //dump($liste);
+        //exit;
+    }
+
+
+    public function selection($liste)
+    {
+        //$handle1 = fopen("../var/uploads/small-french-data.csv", "r");
+        //$ligne = fgetcsv($handle1, 1000, ",");
+        //$ligne2 = fgetcsv($handle1, 1000, ",");
+        //$ligne2 = fgetcsv($handle1, 1000, ",");
+        //$liste = array();
+        //$liste2 = array();
+        $compteur=0;
+        $valid = false;
+        #comparer les tailles
+        foreach ($liste as $ligne) {
+            if($ligne[0]!=='Number') {
+
+                $inchSize = $ligne[39];
+                $cmSize = $ligne[40];
+                $inches = $cmSize / 2.54;
+                $feet = intval($inches / 12);
+                $inches = $inches % 12;
+                $inchSize2 = sprintf("%d' %d" . '"', $feet, $inches);
+                if ($inchSize === $inchSize2) {
+                    #vérifier être majeur
+                    $birthday = $ligne[21];
+                    $date = explode("/", $birthday);
+                    if (count($date) <= 2) {
+                        $age = 0;
+                    } else {
+                        $dateBonFormat = $date[2] . "-" . $date[1] . "-" . $date[0];
+                        $date = explode("-", $dateBonFormat);
+                        $age = date('Y') - $date[0];
+                        if (date('m') < $date[2]) {
+                            $age--;
+                        } elseif (date('d') < $date[1]) {
+                            $age--;
+                        }
+                    }
+                    if ($age >= 18) {
+                        #vérif carte crédit
+                        $CCN = $ligne[24];
+                        $valid = true;
+                        foreach ($liste as $ligne2) {
+                            if ($ligne2[0] !== 'Number' && $ligne[0] !== $ligne2[0] && $ligne[2] !== $ligne2[2]) {
+                                if ($CCN !== $ligne2[24]) {
+                                    $valid = true;
+                                } else {
+                                    $valid = false;
+                                    break;
+                                }
+                            } else {
+                                $valid = true;
+                            }
+                        }
+
+                    }
+
+
+                }
+
+                if ($valid === false) {
+                    unset($liste[$compteur]);
+                }
+
+            }
+            $compteur++;
+        }
+        return $liste;
     }
 }
