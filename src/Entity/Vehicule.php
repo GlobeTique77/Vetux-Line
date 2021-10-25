@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\VehiculeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * @ORM\Entity(repositoryClass=VehiculeRepository::class)
@@ -26,6 +28,17 @@ class Vehicule
      * @ORM\Column(type="integer")
      */
     private $annee;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Client", mappedBy="vehicule2")
+     */
+    private $clients;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Marque", inversedBy="vehicules")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $marque;
 
     public function getId(): ?int
     {
@@ -54,5 +67,28 @@ class Vehicule
         $this->annee = $annee;
 
         return $this;
+    }
+
+    public function __construct()
+    {
+        $this->clients = new ArrayCollection();
+    }
+
+    /**
+     * @return Collection|Client[]
+     */
+    public function getClients()
+    {
+        return $this->clients;
+    }
+
+    public function getMarque(): Marque
+    {
+        return $this->marque;
+    }
+
+    public function setMarque(Marque $marque)
+    {
+        $this->marque = $marque;
     }
 }

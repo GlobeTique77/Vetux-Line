@@ -113,6 +113,12 @@ class Client
     private $vehicule;
 
     /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Vehicule", inversedBy="clients")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $vehicule2;
+
+    /**
      * @ORM\Column(type="float")
      */
     private $GPS_latitude;
@@ -353,6 +359,16 @@ class Client
         $this->vehicule = $vehicule;
 
         return $this;
+    }
+
+    public function getVehicule2(): Vehicule
+    {
+        return $this->vehicule2;
+    }
+
+    public function setVehicule2(Vehicule $vehicule2)
+    {
+        $this->vehicule2 = $vehicule2;
     }
 
     public function getGPSLatitude(): ?float
