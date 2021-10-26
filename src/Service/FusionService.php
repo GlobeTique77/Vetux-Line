@@ -5,15 +5,23 @@ namespace App\Service;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 
 class FusionService
 {
-    public function sequentiel(Request $request, string $uploadDir,
-                               FileUploader $uploader, LoggerInterface $logger): Response
+    /**
+     * @param Request $request
+     * @param string $uploadDir
+     * @param FileUploader $uploader
+     * @param LoggerInterface $logger
+     * @return Response
+     */
+    public function sequentiel()
     {
         $handle1 = fopen("../var/uploads/small-french-data.csv", "r");
         $handle2 = fopen("../var/uploads/small-german-data.csv", "r");
-        $fusion = "../var/uploads/test1.csv";
+        $fusion = "../var/uploads/french-german-client".date("m.d.Y").".csv";
         $fp = fopen($fusion, 'wb');
         $liste = array();
         if($handle1){
@@ -38,20 +46,32 @@ class FusionService
         }else{
             echo "Ouverture fichier 1 impossible !";
         }
+        $liste = $this->selection($liste);
+        $notAccepted = $liste[1];
+        $liste = $liste[0];
+        $liste = $this->projection($liste);
         foreach ($liste as $fields) {
             fputcsv($fp, $fields);
         }
         fclose($fp);
-        dump($liste);
-        exit;
+        $return = [];
+        $return[] = $fusion;
+        $return[] = $notAccepted;
+        return $return;
     }
 
-    public function entrelace(Request $request, string $uploadDir,
-                              FileUploader $uploader, LoggerInterface $logger): Response
+    /**
+     * @param Request $request
+     * @param string $uploadDir
+     * @param FileUploader $uploader
+     * @param LoggerInterface $logger
+     * @return Response
+     */
+    public function entrelace()
     {
         $handle1 = fopen("../var/uploads/small-french-data.csv", "r");
         $handle2 = fopen("../var/uploads/small-german-data.csv", "r");
-        $fusion = "../var/uploads/test2.csv";
+        $fusion = "../var/uploads/french-german-client".date("m.d.Y").".csv";
         $fp = fopen($fusion, 'wb');
         $liste = array();
         if($handle1){
@@ -74,84 +94,117 @@ class FusionService
             }else{
                 echo "Ouverture fichier 2 impossible !";            }
         }else{
-            echo "Ouverture fichier 1 impossible !";        }
+            echo "Ouverture fichier 1 impossible !";
+        }
+        $liste = $this->selection($liste);
+        $notAccepted = $liste[1];
+        $liste = $liste[0];
+        $liste = $this->projection($liste);
         foreach ($liste as $fields) {
             fputcsv($fp, $fields);
         }
         fclose($fp);
-        return $this->file($fusion);
-
-        //dump($liste);
-        //exit;
+        $return = [];
+        $return[] = $fusion;
+        $return[] = $notAccepted;
+        return $return;
     }
 
 
-    public function selection(Request $request, string $uploadDir,
-                              FileUploader $uploader, LoggerInterface $logger): Response
+    public function selection($liste)
     {
-        $handle1 = fopen("../var/uploads/small-french-data.csv", "r");
-        $ligne = fgetcsv($handle1, 1000, ",");
-        $ligne2 = fgetcsv($handle1, 1000, ",");
-        $ligne2 = fgetcsv($handle1, 1000, ",");
-        $liste = array();
-        $liste2 = array();
-
-        #comparer les tailles
-        $inchSize = $ligne2[39];
-        $cmSize = $ligne2[40];
-        $inches = $cmSize/2.54;
-        $feet = intval($inches/12);
-        $inches = $inches%12;
-        $inchSize2 = sprintf("%d' %d".'"', $feet, $inches);
-        if ($inchSize===$inchSize2){
-            #vérifier être majeur
-            $birthday = $ligne2[21];
-            $date = explode("/", $birthday);
-            if(count($date)<=2){
-                $age=0;
-            }
-            $dateBonFormat = $date[2]."-".$date[1]."-".$date[0];
-            $date = explode("-", $dateBonFormat);
-            $age = date('Y') - $date[0];
-            if (date('m') < $date[2]) {
-                $age--;
-            }
-            elseif(date('d') < $date[1]){
-                $age--;
-            }
-            if($age>=18){
-                #vérif carte crédit
-                $CCN = $ligne2[24];
-                $ligne3 = fgetcsv($handle1, 1000, ",");
-                $valid = true;
-                while($ligne3) {
-                    if ($CCN !== $ligne3[24]) {
-                        $valid = true;
-                        dump($ligne3[24]);
-                        $ligne3 = fgetcsv($handle1, 1000, ",");
+        $return = [];
+        $compteur=0;
+        $notAccepted = 0;
+        $valid = false;
+        foreach ($liste as $ligne) {
+            if($ligne[0]!=='Number') {
+                #comparer les tailles
+                $inchSize = $ligne[39];
+                $cmSize = $ligne[40];
+                $inches = $cmSize / 2.54;
+                $feet = intval($inches / 12);
+                $inches = $inches % 12;
+                $inchSize2 = sprintf("%d' %d" . '"', $feet, $inches);
+                if ($inchSize === $inchSize2) {
+                    #vérifier être majeur
+                    $birthday = $ligne[21];
+                    $date = explode("/", $birthday);
+                    if (count($date) <= 2) {
+                        $age = 0;
                     } else {
-                        $valid = false;
-                        break;
+                        $dateBonFormat = $date[2] . "-" . $date[1] . "-" . $date[0];
+                        $date = explode("-", $dateBonFormat);
+                        $age = date('Y') - $date[0];
+                        if (date('m') < $date[2]) {
+                            $age--;
+                        } elseif (date('d') < $date[1]) {
+                            $age--;
+                        }
                     }
+                    if ($age >= 18) {
+                        #vérif carte crédit
+                        $CCN = $ligne[24];
+                        $valid = true;
+                        foreach ($liste as $ligne2) {
+                            if ($ligne2[0] !== 'Number' && $ligne[0] !== $ligne2[0] && $ligne[2] !== $ligne2[2]) {
+                                if ($CCN !== $ligne2[24]) {
+                                    $valid = true;
+                                } else {
+                                    $valid = false;
+                                    $notAccepted++;
+                                    break;
+                                }
+                            } else {
+                                $valid = true;
+                            }
+                        }
+
+                    } else{
+                        $notAccepted++;
+                        $valid = false;
+                    }
+                }else{
+                    $valid = false;
+                    $notAccepted++;
                 }
-                if($valid === true){
-                    echo "c'est good mother fucker";
-                    //return true;
+
+                if ($valid == false) {
+                    unset($liste[$compteur]);
                 }
 
             }
-
-
+            $compteur++;
         }
+        $return[] = $liste;
+        $return[]= $notAccepted;
+        return $return;
+    }
 
-
-        foreach($ligne as $champs){
-            $liste[]=$champs;
+    public function projection($liste)
+    {
+        $liste2 = array();
+        $save = array('Number', 'Title', 'GivenName', 'Surname', 'EmailAddress', 'Birthday', 'TelephoneNumber', 'CCType', 'CCNumber', 'CVV2', 'CCExpires', 'StreetAddress', 'City', 'StateFull', 'ZipCode', 'CountryFull', 'Centimeters', 'Kilograms', 'Vehicle', 'Latitude', 'Longitude');
+        $row = 0;
+        $garde = array();
+        $ligne1 = $liste[0];
+        foreach ($ligne1 as $field) {
+            if (in_array($field, $save)){
+                $garde[] = $row;
+            }
+            $row++;
         }
-        foreach($ligne2 as $champs){
-            $liste2[] = $champs;
+        foreach ($liste as $ligne){
+            $row = 0;
+            foreach ($ligne as $test) {
+                if (in_array($row, $garde)) {
+                    $liste2[] = $test;
+                }
+                $row++;
+            }
+            $listefinal[] = $liste2;
+            $liste2 = array();
         }
-        dump($liste, $liste2, $ligne[1], $inchSize, $inchSize2, $cmSize, $age, $birthday, $CCN, $valid);
-        exit;
+        return $listefinal;
     }
 }

@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Download file{% endblock %}
+
+{% block body %}
+
+    <a href="{{ path('download-entre', relative = false) }}">Télécharger la fusion entrelacé</a>
+
+    {% if f is defined %}
+        <p>nombre de français: {{ f }}</p>
+    {% endif %}
+    {% if g is defined %}
+        <p>nombre d'allemands: {{ g }}</p>
+    {% endif %}
+    {% if total is defined %}
+        <p>nombre de clients acceptés: {{ total }}</p>
+    {% endif %}
+    {% if notAccepted is defined %}
+        <p>nombre de clients rejetés: {{ notAccepted }}</p>
+    {% endif %}
+
+{% endblock %}
