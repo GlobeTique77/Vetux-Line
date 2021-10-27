@@ -1,9 +1,13 @@
-{% extends 'base.html.twig' %}
+{% extends 'userbase.html.twig' %}
 
 {% block title %}Upload file{% endblock %}
 
 {% block body %}
-
+    <h1>Gestionnaire index</h1>
+    <br>
+    <h2>Uploadez les fichiers pour la fusion</h2>
+    <p>Attention, les fichiers doivent être nommés: french-client et german-client et doivent être au format .csv</p>
+    <br>
     <form action="{{ path('do-upload') }}" method="post" enctype="multipart/form-data">
 
         <input type="hidden" name="token" value="{{ csrf_token('upload') }}" />

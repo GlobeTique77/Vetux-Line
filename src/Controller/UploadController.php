@@ -10,6 +10,7 @@ use App\Service\FileUploader;
 use Psr\Log\LoggerInterface;
 use App\Service\FusionService;
 
+#[Route('/home')]
 class UploadController extends AbstractController
 {
     /**
@@ -85,7 +86,6 @@ class UploadController extends AbstractController
         fclose($handle);
         $total = $f + $g;
         return $this->render('home/downloadSequentiel.html.twig', array('f' => $f, 'g' => $g, 'total' => $total, 'notAccepted' => $notAccepted));
-        return $this->file($fusion);
     }
 
     /**

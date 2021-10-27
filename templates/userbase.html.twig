@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Secufony{% endblock %}</title>
+    <title>{% block title %}Vetux-Line{% endblock %}</title>
     {% block stylesheets %}
         <link rel="stylesheet" href="https://bootswatch.com/4/yeti/bootstrap.min.css">
     {% endblock %}
@@ -11,6 +11,21 @@
 <nav class="navbar navbar-light bg-light">
     <a class="navbar-brand">Navbar</a>
     {% if app.user %}
+        <di>
+            <a class="btn btn-sm btn-primary" href="{{ path('user_index') }}">Accueil</a>
+        </di>
+        {% set admin = 'ROLE_ADMIN' %}
+        {% if admin in app.user.roles %}
+            <div>
+                <a class="btn btn-sm btn-success" href="{{ path('admin_index') }}">Espace administrateur</a>
+            </div>
+        {% endif %}
+        {% set gestionnaire = 'ROLE_GESTIONNAIRE' %}
+        {% if gestionnaire in app.user.roles %}
+            <div>
+                <a class="btn btn-sm btn-success" href="{{ path('home') }}">Espace gestionnaire</a>
+            </div>
+        {% endif %}
         <div>
             Bonjour {{ app.user.username }} <a class="btn btn-sm btn-danger" href="{{ path('app_logout') }}">Déconnexion</a>
         </div>

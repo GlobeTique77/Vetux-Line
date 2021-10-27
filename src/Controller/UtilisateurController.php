@@ -14,10 +14,18 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 #[Route('/utilisateur')]
 class UtilisateurController extends AbstractController
 {
-    #[Route('/admin', name: 'utilisateur_index', methods: ['GET'])]
+    #[Route('/admin', name: 'admin_index', methods: ['GET'])]
     public function index(UtilisateurRepository $utilisateurRepository): Response
     {
         return $this->render('utilisateur/index.html.twig', [
+            'utilisateurs' => $utilisateurRepository->findAll(),
+        ]);
+    }
+
+    #[Route('/user', name: 'user_index', methods: ['GET'])]
+    public function indexUser(UtilisateurRepository $utilisateurRepository): Response
+    {
+        return $this->render('utilisateur/user.html.twig', [
             'utilisateurs' => $utilisateurRepository->findAll(),
         ]);
     }

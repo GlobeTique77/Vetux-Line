@@ -69,8 +69,8 @@ class FusionService
      */
     public function entrelace()
     {
-        $handle1 = fopen("../var/uploads/small-french-data.csv", "r");
-        $handle2 = fopen("../var/uploads/small-german-data.csv", "r");
+        $handle1 = fopen("../var/uploads/french-data.csv", "r");
+        $handle2 = fopen("../var/uploads/german-data.csv", "r");
         $fusion = "../var/uploads/french-german-client".date("m.d.Y").".csv";
         $fp = fopen($fusion, 'wb');
         $liste = array();
