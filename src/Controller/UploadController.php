@@ -40,7 +40,7 @@ class UploadController extends AbstractController
         {
 
             $this->addFlash('notice', 'No file specified');
-            return $this->render('home/fusion.html.twig');
+            return $this->render('home/index.html.twig');
             //ancienement:
             //return new Response("No file specified",
             //    Response::HTTP_UNPROCESSABLE_ENTITY, ['content-type' => 'text/plain']);

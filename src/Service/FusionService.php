@@ -2,25 +2,14 @@
 
 namespace App\Service;
 
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
 
 class FusionService
 {
-    /**
-     * @param Request $request
-     * @param string $uploadDir
-     * @param FileUploader $uploader
-     * @param LoggerInterface $logger
-     * @return Response
-     */
+
     public function sequentiel()
     {
-        $handle1 = fopen("../var/uploads/small-french-data.csv", "r");
-        $handle2 = fopen("../var/uploads/small-german-data.csv", "r");
+        $handle1 = fopen("../var/uploads/french-data.csv", "r");
+        $handle2 = fopen("../var/uploads/german-data.csv", "r");
         $fusion = "../var/uploads/french-german-client".date("m.d.Y").".csv";
         $fp = fopen($fusion, 'wb');
         $liste = array();
@@ -60,13 +49,7 @@ class FusionService
         return $return;
     }
 
-    /**
-     * @param Request $request
-     * @param string $uploadDir
-     * @param FileUploader $uploader
-     * @param LoggerInterface $logger
-     * @return Response
-     */
+
     public function entrelace()
     {
         $handle1 = fopen("../var/uploads/french-data.csv", "r");
@@ -196,15 +179,15 @@ class FusionService
         }
         foreach ($liste as $ligne){
             $row = 0;
-            foreach ($ligne as $test) {
+            foreach ($ligne as $field) {
                 if (in_array($row, $garde)) {
-                    $liste2[] = $test;
+                    $liste2[] = $field;
                 }
                 $row++;
             }
-            $listefinal[] = $liste2;
+            $listeFinal[] = $liste2;
             $liste2 = array();
         }
-        return $listefinal;
+        return $listeFinal;
     }
 }
