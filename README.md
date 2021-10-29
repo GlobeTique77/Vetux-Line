@@ -353,13 +353,193 @@ Et après on met le chemin d'accès pour faire l'uploads des fichiers puis la fu
 Ce qui donne pour le gestionnaire:
 ![image](https://user-images.githubusercontent.com/78152264/139484550-2f1d812e-0e91-437e-877d-1318a1c0577c.png)
 
-Et quand on clique sur son espace, on arrive sur le chemin /home et c^té client donne:  
+Et quand on clique sur son espace, on arrive sur le chemin /home et côté client donne:  
 ![image](https://user-images.githubusercontent.com/78152264/139485618-ddf29c2e-917a-4849-aad3-cdb5afa8be7d.png)
 
+Voici le code du formulaire:  
+```html
+<form action="{{ path('do-upload') }}" method="post" enctype="multipart/form-data">
 
+        <input type="hidden" name="token" value="{{ csrf_token('upload') }}" />
+
+        <div>
+            <label for="myfile">File to upload:</label>
+            <input type="file" name="myfile[]" id="myfile1" accept=".csv">
+        </div>
+        <div>
+            <label for="myfile">File to upload:</label>
+            <input type="file" name="myfile[]" id="myfile2" accept=".csv">
+        </div>
+
+        <button type="submit">Send</button>
+
+    </form>
+```
+
+Comme on le voit à la prmeière ligne, ça envoie à la route do-upload qui se trouve dans le UploadController.php.  
+Donc la fonction index() qui prend comme service le FileUploader.php
+On a pris le code de cette exemple d'upload sur symfony donné par l'énnoncé de la mission.  
+[L'exemple](https://zetcode.com/symfony/uploadfile/)
+
+On a modifié cette partie là:
+
+```php
+$files = $request->files->get('myfile');
+if (empty($files))
+        {
+
+            $this->addFlash('notice', 'No file specified');
+            return $this->render('home/index.html.twig');
+        }
+        foreach ($files as $file)
+        {
+            $filetype = $file->getMimeType();
+
+            $filename = $file->getClientOriginalName();
+            $uploader->upload($uploadDir, $file, $filename);
+        }
+        $this->addFlash('notice', 'Files uploaded');
+        return $this->render('home/fusion.html.twig');
+```
+
+La première ligne récupère dans le tableau $files les fichier envoyés par post du formulaire.  
+On vérifie s'il y a des fichiers, sinon on renvoie au formulaire avec un message flash qui précise que le gestionnaire n'a envoyé aucun fichier.  
+Avec le foreach on regarde pour chaque fichier:  
+- son type
+- son nom  
+
+Puis on utilise la fonction upload du service FileUploader.php pour finaliser l'upload et enregistrer les fichiers sur le serveur.  
+Le return envoie le client sur la page home/fusion.html.twig.  
+Cette page contient 2 liens, un pour la fusion séquentiel, l'autre pour la fusion entrelacé.  
+![image](https://cdn.discordapp.com/attachments/775368238137606184/903723875811065986/Capture.PNG)
+
+Le code: 
+```html
+{% extends 'userbase.html.twig' %}
+
+{% block title %}Make fusion{% endblock %}
+
+{% block body %}
+
+    <a href="{{ path('fusion-seq', relative = false) }}">Faire la fusion séquentiel</a>
+    <br><br>
+    <a href="{{ path('fusion-entre', relative = false) }}">Faire la fusion entrelacé</a>
+
+{% endblock %}
+```
+
+Les deux liens nous amènent sur deux focntions de UploadController.php, la fonction sequentiel et la fonction entrelace.  
+
+### D/
+
+Les fonctions sequentiel et entrelace utilisent le FusionService et sont presque des fonctions clonés.  
+Voici le code de sequantiel(): 
+
+```php
+/**
+     * @Route("/fsequentiel", name="fusion-seq")
+     */
+    public function sequentiel(FusionService $fusionService)
+    {
+        $fusion = $fusionService->sequentiel();
+        $notAccepted = $fusion[1];
+        $fusion = $fusion[0];
+        $handle = fopen($fusion, 'r');
+        $f = 0;
+        $g = 0;
+        $total = 0;
+        if ($handle){
+            $ligne = fgetcsv($handle, 1000, ",");
+            $ligne = fgetcsv($handle, 1000, ",");
+            while ($ligne) {
+                if (in_array("France", $ligne)){
+                    $f++;
+                } else{
+                    $g++;
+                }
+                $ligne = fgetcsv($handle, 1000, ",");
+            }
+        }
+        fclose($handle);
+        $total = $f + $g;
+        return $this->render('home/downloadSequentiel.html.twig', array('f' => $f, 'g' => $g, 'total' => $total, 'notAccepted' => $notAccepted));
+    }
+```
+
+Ce qui change pour entrelace() c'est sa route:  
+@Route("/fentrelace", name="fusion-entre")
+L'appel à la fonction qui fait la fusion des csv:  
+$fusion = $fusionService->entrelace();  
+Et la page où est renvoyé les donnés:  
+return $this->render('home/downloadEntrelace.html.twig', array('f' => $f, 'g' => $g, 'total' => $total, 'notAccepted' => $notAccepted));
+
+Les méthodes de fusion retournent deux choses:  
+-le fichier résultat de la fusion
+-le nombre de clients rejetés  
+On les récupère donc avec la première ligne et on les met dans 2 variables différentes.  
+Ensuite on ouvre le fichier de résultat de la fusion avec le fopen et on crée trois nouvelles variables qui représentent le nombre de clients français, 
+le nombre de clients allemands et le nombre total de client (accepté).  
+Après on vérifie si le fichier est bien ouvert puis on passe directement à la deuxième ligne en faisant deux fois fgetcsv.  
+Tant qu'il y a une ligne, on regarde si dans cette ligne se trouve 'France' avec if (in_array("France", $ligne)).  
+Si ça renvoie true, on augmente $f de un, si ça renvoie false, ça augmente $g de un.  
+Puis on passe à la ligne d'après et ainsi de suite.  
+A la fin du while, on ferme le fichier et on calcul le total de client avec $total = $f + $g.  
+Et enfin on retourne à la page home/downloadSequentiel.html.twig ou home/downloadEntrelace.html.twig les différentes variables qui sont là pour des statistiques.  
+
+Voilà ce que donne cette page (même visuel et même statistiques pour les deux fusions):  
+![image](https://cdn.discordapp.com/attachments/775368238137606184/903732385194065990/Capture.PNG)
+
+Et le code: 
+```html
+{% extends 'userbase.html.twig' %}
+
+{% block title %}Download file{% endblock %}
+
+{% block body %}
+
+    <a href="{{ path('download-seq', relative = false) }}">Télécharger la fusion séquentiel</a>
+
+    {% if f is defined %}
+        <p>nombre de français: {{ f }}</p>
+    {% endif %}
+    {% if g is defined %}
+        <p>nombre d'allemands: {{ g }}</p>
+    {% endif %}
+    {% if total is defined %}
+        <p>nombre de clients acceptés: {{ total }}</p>
+    {% endif %}
+    {% if notAccepted is defined %}
+        <p>nombre de clients rejetés: {{ notAccepted }}</p>
+    {% endif %}
+
+{% endblock %}
+```
+
+Le href renvoie à la fonction de la route download-seq pour la fusion séquentiel ou download-entre si on a choisit la fusion entrelacé avant.  
+Les {% if variable is defined %} vérifient si les variables existent donc si la page les a bien reçu.  
+Et pour utiliser ces variables on fait {{ variable }}.  
+Les routes cités un peu plus haut renvoient aux fonctions downloadSequentiel et downloadEntrelace qui elles aussi font appel au service FusionService.php
+Voici le code de downloadSequentiel:
+```php
+    /**
+     * @Route("/downloadSequentiel", name="download-seq")
+     */
+    public function downloadSequentiel(FusionService $fusionService){
+        $fusion = $fusionService->sequentiel();
+        $fusion = $fusion[0];
+
+        return $this->file($fusion);
+    }
+```
+
+Les changements pour downloadEntrelace sont la route:  
+@Route("/downloadEntrelace", name="download-entre")  
+et la fonction appellée:  
+$fusion = $fusionService->entrelace();
+
+Nous avons dis plus haut que sequentiel() et entrelace() retournaient un tableau contenant le fichier et le nombre de clients rejetés.  
+C'est pour ça qu'on met dans $fusion seulement le premier élément de $fusion[] donc le fichier résultat de la fusion.  
+Le return renvoie à l'utilisateur le fichier directement en téléchargement donc le download.  
  
- 
- 
- 
- 
+ ## Deuxième partie: ETL
  
