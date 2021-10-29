@@ -273,13 +273,92 @@ while ($ligne1 || $ligne2) {
  ### C/
  
  Comme on avait besoin de différents types d'utilisateurs, nous avions besoin du security-bundle.  
- Pour l'installer on a fait la commande:  
- composer require symfony/security-bundle 
- Et comme on a besoin d'une DB on a modifié dans le fichier .env la ligne commençant par DATABASE_URL="mysql... par  
- DATABASE_URL="mysql://sio:sio@127.0.0.1:3306/vetux-line?serverVersion=mariadb-10.4.21" (la version est différente entre les membres du groupe).  
- Puis une classe Utilisateur.php avec:  
- php bin/console make:user  
- Et on choisit comme propriété unique username.  
+ On a concrétement suivi le td secufony de Mr.Chamillard.  
+ [Le td en question](https://slam-vinci-melun.github.io/sio22/phase1/TD_Secufony_2.odt)
+ 
+ On a créé 3 types d'utilisateur:  
+ - ROLE_USER (donné à chaque utilisateur)
+ - ROLE_ADMIN (peut voir la liste des utilisateurs, les modifier et supprimer)
+ - ROLE_GESTIONNAIRE (peut faire la fusion des fichiers csv)
+ 
+ Le code du template pour chaque page: 
+ 
+ ```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Vetux-Line{% endblock %}</title>
+    {% block stylesheets %}
+        <link rel="stylesheet" href="https://bootswatch.com/4/yeti/bootstrap.min.css">
+    {% endblock %}
+</head>
+<body>
+<nav class="navbar navbar-light bg-light">
+    <a class="navbar-brand">Navbar</a>
+    {% if app.user %}
+        <di>
+            <a class="btn btn-sm btn-primary" href="{{ path('user_index') }}">Accueil</a>
+        </di>
+        {% set admin = 'ROLE_ADMIN' %}
+        {% if admin in app.user.roles %}
+            <div>
+                <a class="btn btn-sm btn-success" href="{{ path('admin_index') }}">Espace administrateur</a>
+            </div>
+        {% endif %}
+        {% set gestionnaire = 'ROLE_GESTIONNAIRE' %}
+        {% if gestionnaire in app.user.roles %}
+            <div>
+                <a class="btn btn-sm btn-success" href="{{ path('home') }}">Espace gestionnaire</a>
+            </div>
+        {% endif %}
+        <div>
+            Bonjour {{ app.user.username }} <a class="btn btn-sm btn-danger" href="{{ path('app_logout') }}">Déconnexion</a>
+        </div>
+    {% else %}
+        <div>
+            <a class="btn btn-sm btn-primary" href="{{ path('utilisateur_new') }}">S'inscrire</a>
+            <a class="btn btn-sm btn-success" href="{{ path('app_login') }}">Se connecter</a>
+        </div>
+    {% endif %}
+</nav>
+<div class="container">
+    {% if message is defined %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    {% block body %}
+    {% endblock %}
+
+</div>
+{% block javascripts %}
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous">
+    </script>
+    <script src="/js/script.js"></script>
+{% endblock %}
+</body>
+</html>
+```
+
+Dans la navbar on vérifie si l'utilisateur est connécté avec {% if app.user %} et pour connaitre son rôle c'est dans app.user.roles.  
+On crée des variable contenant les noms des rôles et on demande si le contenue de cette variable est dans app.user.roles pour vérifier le rôle.  
+Dans le cas du gestionnaire:  
+{% set gestionnaire = 'ROLE_GESTIONNAIRE' %}  
+{% if gestionnaire in app.user.roles %}
+Et après on met le chemin d'accès pour faire l'uploads des fichiers puis la fusion:  
+<a class="btn btn-sm btn-success" href="{{ path('home') }}">Espace gestionnaire</a>
+
+Ce qui donne pour le gestionnaire:
+![image](https://user-images.githubusercontent.com/78152264/139484550-2f1d812e-0e91-437e-877d-1318a1c0577c.png)
+
+Et quand on clique sur son espace, on arrive sur le chemin /home et c^té client donne:  
+![image](https://user-images.githubusercontent.com/78152264/139485618-ddf29c2e-917a-4849-aad3-cdb5afa8be7d.png)
+
+
+ 
+ 
  
  
  
