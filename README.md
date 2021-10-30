@@ -1197,12 +1197,13 @@ toutes les migrations.)
 ## Conclusion
 
 Nous passons directement à la conclusion car nous n'avons pas pu réaliser le reste (les Evil User Stories seront terminés pour la semaine prochaine).  
-Dans la première partie il nous manque les tests unitaire et dans la seconde tout ce qui est à partir de la fonction ETL.  
+Dans la première partie il nous manque les tests unitaire et dans la seconde tout ce qui est à partir de la fonction ETL. 
+Nous commencions à étudier comment faire la focntion ETL.  
 Pourquoi n'avons nous pas finit le projet ?  
-La principale raison est la mauvaise gestion du temps mais pas que, on a aussi eu des problèmes matérielle et des problèmes avc git qui nous on fait perdre beaucoup de temps.  
+La principale raison est la mauvaise gestion du temps mais pas que, on a aussi eu des problèmes matérielle et des problèmes avec git qui nous on fait perdre beaucoup de temps.  
 Ensuite pendant la première semaine des vacances, c'était compliqué de travailler à cause de plusieurs facteurs personels et qui sont pas forcément prévus.  
 Ce qui nous a fait perdre encore plus de temps.  
-Tout cela aurait pû être éviter si nous avions mieux géré notre temps au début et nous en sommes conscient.  
+Tout cela aurait pû être éviter si nous avions mieux géré notre temps au début et nous en sommes conscients.  
 La semaine prochaines nous vous livrerons ce document mis à jour avec les Evil User Stories.
 
 
