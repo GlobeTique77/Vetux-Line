@@ -22,8 +22,8 @@ Ce README.md que vous êtes entrain de lire.
 
 ### B/
 
-Nous avions commencé par l'upload, c'est pourquoi nous avons fait notre injection de service dans UploadController.php (on parlera de ce controller dans la partie C).
-Notre service s'appelle FusionService.php et se trouve dans src/Service.
+Nous avions commencé par l'upload, c'est pourquoi nous avons fait notre injection de service dans UploadController.php (on parlera de ce controller dans la partie C).  
+Notre service s'appelle FusionService.php et se trouve dans src/Service.  
 Dans ce service nous avons mis la fusion séquentiel, la fusion entrelacé ainsi que les fonction selection et projection.
 
 #### La fusion séquentiel
@@ -193,7 +193,7 @@ while ($ligne1 || $ligne2) {
  la ligne ne soit pas 'Number'.  
  Le premier test est celui des tailles en cm et pieds/pouces.  
  On prend les valeurs mais c'est pas comparable comme les pieds/pouces n'ont pas la même syntax.  
- Alors on converti la taille en cm en pieds/pouces pour ensuite les comparer.
+ Alors on converti la taille en cm en pieds/pouces pour ensuite les comparer.  
  Si c'est les même on passe au second test, sinon on met +1 à $notAccepted (le compteur de clients rejetés), 
  on remet $valid = false car après les trois premiers, ceux qui passait pas ce test avait $valid qui était true donc on a dû forcé avec $valid = false.  
  Puis on supprime la ligne de $liste avec :
@@ -216,8 +216,8 @@ while ($ligne1 || $ligne2) {
  Puis on vérifie que les CCN sont différents, si oui $valid = true donc il ne se fait pas supprimé, sinon $valid = false et on sort du foreach pour supprimé la ligne 
  et augmenté $notAcccepted .
  
- Après cette série de test que passe une ligne, comme dit plus haut, en fonction de $valid, il se fait supprimé de $liste ou non et $notAccepted augmente ou pas.
- Puis $compteur augmente, c'est cette vraiable qui permet de donner un numéro à la ligne qui se fera supprimer de $liste par unset($liste[$compteur]).
+ Après cette série de test que passe une ligne, comme dit plus haut, en fonction de $valid, il se fait supprimé de $liste ou non et $notAccepted augmente ou pas.  
+ Puis $compteur augmente, c'est cette vraiable qui permet de donner un numéro à la ligne qui se fera supprimer de $liste par unset($liste[$compteur]).  
  Ensuite on met dans le tableau $return la liste triée ($liste) et $notAccepted.  
  Et enfin on return $return.
  
@@ -256,7 +256,7 @@ while ($ligne1 || $ligne2) {
  
  Cette fonction permet de garder les colonnes qu'on veut et qui sont dans le tableau $save.  
  Elle prend elle aussi en paramètre $liste donné par les fonctions fusion.  
- On récupère la première ligne de la liste donc celle qui contient les colonnes.
+ On récupère la première ligne de la liste donc celle qui contient les colonnes.  
  Avec un foreach on va regarder chaque colonne pour vérifier avec if(in_array($field, $save)) si la colonne est bien dans celle que l'on veut garder.  
  Si oui on met $row (l'index des colonnes) dans le tableau $garde et après le if on augmente $row de un et ainsi de suite.  
  Après avec un foreach on passe chaque ligne et on remet $row à 0 puis on refait un autre foreach pour passer chaque colonne.  
@@ -346,11 +346,13 @@ Dans la navbar on vérifie si l'utilisateur est connécté avec {% if app.user %
 On crée des variable contenant les noms des rôles et on demande si le contenue de cette variable est dans app.user.roles pour vérifier le rôle.  
 Dans le cas du gestionnaire:  
 {% set gestionnaire = 'ROLE_GESTIONNAIRE' %}  
-{% if gestionnaire in app.user.roles %}
+{% if gestionnaire in app.user.roles %}  
 Et après on met le chemin d'accès pour faire l'uploads des fichiers puis la fusion:  
+```html
 <a class="btn btn-sm btn-success" href="{{ path('home') }}">Espace gestionnaire</a>
+```
 
-Ce qui donne pour le gestionnaire:
+Ce qui donne pour le gestionnaire:  
 ![image](https://user-images.githubusercontent.com/78152264/139484550-2f1d812e-0e91-437e-877d-1318a1c0577c.png)
 
 Et quand on clique sur son espace, on arrive sur le chemin /home et côté client donne:  
@@ -377,11 +379,11 @@ Voici le code du formulaire:
 ```
 
 Comme on le voit à la prmeière ligne, ça envoie à la route do-upload qui se trouve dans le UploadController.php.  
-Donc la fonction index() qui prend comme service le FileUploader.php
+Donc la fonction index() qui prend comme service le FileUploader.php .  
 On a pris le code de cette exemple d'upload sur symfony donné par l'énnoncé de la mission.  
-[L'exemple](https://zetcode.com/symfony/uploadfile/)
+[L'exemple](https://zetcode.com/symfony/uploadfile/)  
 
-On a modifié cette partie là:
+On a modifié cette partie là:  
 
 ```php
 $files = $request->files->get('myfile');
@@ -411,7 +413,7 @@ Avec le foreach on regarde pour chaque fichier:
 Puis on utilise la fonction upload du service FileUploader.php pour finaliser l'upload et enregistrer les fichiers sur le serveur.  
 Le return envoie le client sur la page home/fusion.html.twig.  
 Cette page contient 2 liens, un pour la fusion séquentiel, l'autre pour la fusion entrelacé.  
-![image](https://cdn.discordapp.com/attachments/775368238137606184/903723875811065986/Capture.PNG)
+![image](https://cdn.discordapp.com/attachments/775368238137606184/903723875811065986/Capture.PNG)  
 
 Le code: 
 ```html
@@ -467,29 +469,29 @@ Voici le code de sequantiel():
 ```
 
 Ce qui change pour entrelace() c'est sa route:  
-@Route("/fentrelace", name="fusion-entre")
+@Route("/fentrelace", name="fusion-entre")  
 L'appel à la fonction qui fait la fusion des csv:  
 $fusion = $fusionService->entrelace();  
 Et la page où est renvoyé les donnés:  
 return $this->render('home/downloadEntrelace.html.twig', array('f' => $f, 'g' => $g, 'total' => $total, 'notAccepted' => $notAccepted));
 
 Les méthodes de fusion retournent deux choses:  
--le fichier résultat de la fusion
+-le fichier résultat de la fusion  
 -le nombre de clients rejetés  
 On les récupère donc avec la première ligne et on les met dans 2 variables différentes.  
-Ensuite on ouvre le fichier de résultat de la fusion avec le fopen et on crée trois nouvelles variables qui représentent le nombre de clients français, 
+Ensuite on ouvre le fichier de résultat de la fusion avec le fopen et on crée trois nouvelles variables qui représentent le nombre de clients français,  
 le nombre de clients allemands et le nombre total de client (accepté).  
 Après on vérifie si le fichier est bien ouvert puis on passe directement à la deuxième ligne en faisant deux fois fgetcsv.  
 Tant qu'il y a une ligne, on regarde si dans cette ligne se trouve 'France' avec if (in_array("France", $ligne)).  
 Si ça renvoie true, on augmente $f de un, si ça renvoie false, ça augmente $g de un.  
 Puis on passe à la ligne d'après et ainsi de suite.  
 A la fin du while, on ferme le fichier et on calcul le total de client avec $total = $f + $g.  
-Et enfin on retourne à la page home/downloadSequentiel.html.twig ou home/downloadEntrelace.html.twig les différentes variables qui sont là pour des statistiques.  
+Et enfin on retourne à la page home/downloadSequentiel.html.twig ou home/downloadEntrelace.html.twig les différentes variables qui sont là pour des statistiques.   
 
 Voilà ce que donne cette page (même visuel et même statistiques pour les deux fusions):  
-![image](https://cdn.discordapp.com/attachments/775368238137606184/903732385194065990/Capture.PNG)
+![image](https://cdn.discordapp.com/attachments/775368238137606184/903732385194065990/Capture.PNG)  
 
-Et le code: 
+Et le code:  
 ```html
 {% extends 'userbase.html.twig' %}
 
@@ -518,8 +520,8 @@ Et le code:
 Le href renvoie à la fonction de la route download-seq pour la fusion séquentiel ou download-entre si on a choisit la fusion entrelacé avant.  
 Les {% if variable is defined %} vérifient si les variables existent donc si la page les a bien reçu.  
 Et pour utiliser ces variables on fait {{ variable }}.  
-Les routes cités un peu plus haut renvoient aux fonctions downloadSequentiel et downloadEntrelace qui elles aussi font appel au service FusionService.php
-Voici le code de downloadSequentiel:
+Les routes cités un peu plus haut renvoient aux fonctions downloadSequentiel et downloadEntrelace qui elles aussi font appel au service FusionService.php  
+Voici le code de downloadSequentiel:  
 ```php
     /**
      * @Route("/downloadSequentiel", name="download-seq")
@@ -543,3 +545,664 @@ Le return renvoie à l'utilisateur le fichier directement en téléchargement do
  
  ## Deuxième partie: ETL
  
+### A/
+
+Nous avons créé 3 entités selon le shéma conceptuel client-auto que veut Vetux-Line.  
+On a donc l'entité Client, l'entité Vehicule et l'entité Marque.  
+Pour les créer, on a utilisé la commande: php bin/console make:entity nameEntity  
+On a dû renseigner les champs juste après avoir entré la commande.  
+Les champs pour Client sont les champs gardés avec la projection.  
+Voici le code de cette entité:  
+```php
+<?php
+
+namespace App\Entity;
+
+use App\Repository\ClientRepository;
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity(repositoryClass=ClientRepository::class)
+ */
+class Client
+{
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue
+     * @ORM\Column(type="integer")
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $genre;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $titre;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $nom;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $prenom;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $email;
+
+    /**
+     * @ORM\Column(type="date")
+     */
+    private $date_naissance;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $num_tel;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $CCType;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $CCNumber;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $CVV2;
+
+    /**
+     * @ORM\Column(type="date")
+     */
+    private $CCExpires;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $Adresse;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $ville;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $region;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $code_zip;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $pays;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $taille;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $poids;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Vehicule", inversedBy="clients")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $vehicule;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $GPS_latitude;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $GPS_longitude;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getGenre(): ?string
+    {
+        return $this->genre;
+    }
+
+    public function setGenre(string $genre): self
+    {
+        $this->genre = $genre;
+
+        return $this;
+    }
+
+    public function getTitre(): ?string
+    {
+        return $this->titre;
+    }
+
+    public function setTitre(string $titre): self
+    {
+        $this->titre = $titre;
+
+        return $this;
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): self
+    {
+        $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getPrenom(): ?string
+    {
+        return $this->prenom;
+    }
+
+    public function setPrenom(string $prenom): self
+    {
+        $this->prenom = $prenom;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function getDateNaissance(): ?\DateTimeInterface
+    {
+        return $this->date_naissance;
+    }
+
+    public function setDateNaissance(\DateTimeInterface $date_naissance): self
+    {
+        $this->date_naissance = $date_naissance;
+
+        return $this;
+    }
+
+    public function getNumTel(): ?int
+    {
+        return $this->num_tel;
+    }
+
+    public function setNumTel(int $num_tel): self
+    {
+        $this->num_tel = $num_tel;
+
+        return $this;
+    }
+
+    public function getCCType(): ?string
+    {
+        return $this->CCType;
+    }
+
+    public function setCCType(string $CCType): self
+    {
+        $this->CCType = $CCType;
+
+        return $this;
+    }
+
+    public function getCCNumber(): ?int
+    {
+        return $this->CCNumber;
+    }
+
+    public function setCCNumber(int $CCNumber): self
+    {
+        $this->CCNumber = $CCNumber;
+
+        return $this;
+    }
+
+    public function getCVV2(): ?int
+    {
+        return $this->CVV2;
+    }
+
+    public function setCVV2(int $CVV2): self
+    {
+        $this->CVV2 = $CVV2;
+
+        return $this;
+    }
+
+    public function getCCExpires(): ?\DateTimeInterface
+    {
+        return $this->CCExpires;
+    }
+
+    public function setCCExpires(\DateTimeInterface $CCExpires): self
+    {
+        $this->CCExpires = $CCExpires;
+
+        return $this;
+    }
+
+    public function getAdresse(): ?string
+    {
+        return $this->Adresse;
+    }
+
+    public function setAdresse(string $Adresse): self
+    {
+        $this->Adresse = $Adresse;
+
+        return $this;
+    }
+
+    public function getVille(): ?string
+    {
+        return $this->ville;
+    }
+
+    public function setVille(string $ville): self
+    {
+        $this->ville = $ville;
+
+        return $this;
+    }
+
+    public function getRegion(): ?string
+    {
+        return $this->region;
+    }
+
+    public function setRegion(string $region): self
+    {
+        $this->region = $region;
+
+        return $this;
+    }
+
+    public function getCodeZip(): ?int
+    {
+        return $this->code_zip;
+    }
+
+    public function setCodeZip(int $code_zip): self
+    {
+        $this->code_zip = $code_zip;
+
+        return $this;
+    }
+
+    public function getPays(): ?string
+    {
+        return $this->pays;
+    }
+
+    public function setPays(string $pays): self
+    {
+        $this->pays = $pays;
+
+        return $this;
+    }
+
+    public function getTaille(): ?int
+    {
+        return $this->taille;
+    }
+
+    public function setTaille(int $taille): self
+    {
+        $this->taille = $taille;
+
+        return $this;
+    }
+
+    public function getPoids(): ?float
+    {
+        return $this->poids;
+    }
+
+    public function setPoids(float $poids): self
+    {
+        $this->poids = $poids;
+
+        return $this;
+    }
+
+    public function getVehicule(): Vehicule
+    {
+        return $this->vehicule;
+    }
+
+    public function setVehicule(Vehicule $vehicule)
+    {
+        $this->vehicule = $vehicule;
+    }
+
+    public function getGPSLatitude(): ?float
+    {
+        return $this->GPS_latitude;
+    }
+
+    public function setGPSLatitude(float $GPS_latitude): self
+    {
+        $this->GPS_latitude = $GPS_latitude;
+
+        return $this;
+    }
+
+    public function getGPSLongitude(): ?float
+    {
+        return $this->GPS_longitude;
+    }
+
+    public function setGPSLongitude(float $GPS_longitude): self
+    {
+        $this->GPS_longitude = $GPS_longitude;
+
+        return $this;
+    }
+}
+```
+
+Pour les entités Vehicule et Marque, on a les champs du shéma coonceptuel.  
+Le code de Vehicule:  
+```php
+<?php
+
+namespace App\Entity;
+
+use App\Repository\VehiculeRepository;
+use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
+/**
+ * @ORM\Entity(repositoryClass=VehiculeRepository::class)
+ */
+class Vehicule
+{
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue
+     * @ORM\Column(type="integer")
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $modele;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $annee;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Client", mappedBy="vehicule")
+     */
+    private $clients;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Marque", inversedBy="vehicules")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $marque;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getModele(): ?string
+    {
+        return $this->modele;
+    }
+
+    public function setModele(string $modele): self
+    {
+        $this->modele = $modele;
+
+        return $this;
+    }
+
+    public function getAnnee(): ?int
+    {
+        return $this->annee;
+    }
+
+    public function setAnnee(int $annee): self
+    {
+        $this->annee = $annee;
+
+        return $this;
+    }
+
+    public function __construct()
+    {
+        $this->clients = new ArrayCollection();
+    }
+
+    /**
+     * @return Collection|Client[]
+     */
+    public function getClients()
+    {
+        return $this->clients;
+    }
+
+    public function getMarque(): Marque
+    {
+        return $this->marque;
+    }
+
+    public function setMarque(Marque $marque)
+    {
+        $this->marque = $marque;
+    }
+}
+
+```
+Et le code de Marque:  
+```php
+<?php
+
+namespace App\Entity;
+
+use App\Repository\MarqueRepository;
+use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
+/**
+ * @ORM\Entity(repositoryClass=MarqueRepository::class)
+ */
+class Marque
+{
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue
+     * @ORM\Column(type="integer")
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $nom;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Vehicule", mappedBy="marque")
+     */
+    private $vehicules;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): self
+    {
+        $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function __construct()
+    {
+        $this->vehicules = new ArrayCollection();
+    }
+
+    /**
+     * @return Collection|Vehicule[]
+     */
+    public function getVehicules()
+    {
+        return $this->vehicules;
+    }
+}
+```
+
+On voit bien dans le shéma conceptuel que ces entités sont liés.  
+Pour cela on utilise many to one et one to many.  
+Il y a une relation entre Client et Vehicule et une autre pour Vehicule et Marque.  
+Un client peut avoir au maximum un véhicule et plusieurs clients peuvent avoir le même modèle de véhicule.  
+C'est pourquoi nous aurons dans Client.php un many to one et dans Vehicule.php un one to many.  
+
+Client.php
+```php
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Vehicule", inversedBy="clients")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $vehicule;
+    [...]
+    public function getVehicule(): Vehicule
+    {
+        return $this->vehicule;
+    }
+
+    public function setVehicule(Vehicule $vehicule)
+    {
+        $this->vehicule = $vehicule;
+    }
+```
+Vehicule.php
+```php
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Client", mappedBy="vehicule")
+     */
+    private $clients;
+    [...]
+    /**
+     * @return Collection|Client[]
+     */
+    public function getClients()
+    {
+        return $this->clients;
+    }
+```
+Pour la relation entre Vehicule et Marque, Vehicule aura un many to one et Marque un one to many.  
+Un véhicule n'a qu'une seule marque mais plusieurs véhicules peuvent avoir la même marque.  
+
+Vehicule.php
+```php
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Marque", inversedBy="vehicules")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $marque;
+    [...]
+    public function getMarque(): Marque
+    {
+        return $this->marque;
+    }
+
+    public function setMarque(Marque $marque)
+    {
+        $this->marque = $marque;
+    }
+```
+
+Marque.php
+```php
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Vehicule", mappedBy="marque")
+     */
+    private $vehicules;
+    [...]
+    /**
+     * @return Collection|Vehicule[]
+     */
+    public function getVehicules()
+    {
+        return $this->vehicules;
+    }
+```
+
+Nos entités sont bien reliés.  
+
+### B/
+
+Passons maintenant au lien avec le serveur de base de données, ici MySql.  
+Dans le fichier .env on doit modifier cette ligne commençant par DATABASE_URL="mysql .  
+Voici un exemple des changements comme nous n'avons pas les mêmes versions de serveur de base de données ou de comptes utilisateurs au sein du groupe.  
+DATABASE_URL="mysql://sio:sio@127.0.0.1:3306/vetux-line?serverVersion=mariadb-10.4.21"  
+Ici on a remplacé db_user par sio, db_password par sio, db_name par vetux-line et ce qui suit après le = par mariadb-10.4.21.  
+Ensuite on éxécute ces deux commandes pour faire la migration de nos entités vers la DB avec doctrine:  
+php bin/console make:migration  
+php bin/console doctrine:migrations:migrate  
+Et ça donne dans notre base de donnée vetux-line les tableaux suivants:  
+![image](https://user-images.githubusercontent.com/78152264/139537828-f2321458-28b0-4e99-90b2-19f040d811ce.png)  
+(Le tableau utilisateur sert pour la gestion des différent type d'utilisateur pour la première partie et doctrine migration version est un tableau montrant 
+toutes les migrations.)  
+
+## Conclusion
+
+Nous passons directement à la conclusion car nous n'avons pas pu réaliser le reste (les Evil User Stories seront terminés pour la semaine prochaine).  
+Dans la première partie il nous manque les tests unitaire et dans la seconde tout ce qui est à partir de la fonction ETL.  
+Pourquoi n'avons nous pas finit le projet ?  
+La principale raison est la mauvaise gestion du temps mais pas que, on a aussi eu des problèmes matérielle et des problèmes avc git qui nous on fait perdre beaucoup de temps.  
+Ensuite pendant la première semaine des vacances, c'était compliqué de travailler à cause de plusieurs facteurs personels et qui sont pas forcément prévus.  
+Ce qui nous a fait perdre encore plus de temps.  
+Tout cela aurait pû être éviter si nous avions mieux géré notre temps au début et nous en sommes conscient.  
+La semaine prochaines nous vous livrerons ce document mis à jour avec les Evil User Stories.
+
+
