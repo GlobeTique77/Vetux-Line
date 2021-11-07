@@ -1210,7 +1210,7 @@ avec:
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 ```
 
-Puis dans le même contrôleur, je modifie la focntion edit:
+Puis dans le même contrôleur, je modifie la fonction edit:
 
 ```php
  #[Route('/admin/{id}/edit', name: 'utilisateur_edit', methods: ['GET','POST'])]
