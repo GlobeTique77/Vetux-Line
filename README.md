@@ -1194,6 +1194,122 @@ Et ça donne dans notre base de donnée vetux-line les tableaux suivants:
 (Le tableau utilisateur sert pour la gestion des différent type d'utilisateur pour la première partie et doctrine migration version est un tableau montrant 
 toutes les migrations.)  
 
+## Evil User Stories
+
+### A/
+
+En tant que personne malveillante, j'ai réussi à savoir que cette application est faite avec symfony et que les développeurs ont utilisés le security bundle,  
+ils ont certainement hashé les mots de passe à la création mais pas à la modification alors je veux avoir accès à la base de données pour récupérer les mots de passe et  
+les identifiants des utilisateurs qui ont changé leur mot de passe.
+
+En tant que développeur, je veux hasher les mots de passe à leur modification pour empêcher un utilisateur malveillant de pouvoir les lire en clair sur  
+la base de données et les utilisés pour une utilisation malveillante. Pour cela dans UtilisateurController.php je dois importer la librairie UserPasswordHasherInterface  
+avec: 
+
+```php
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+```
+
+Puis dans le même contrôleur, je modifie la focntion edit:
+
+```php
+ #[Route('/admin/{id}/edit', name: 'utilisateur_edit', methods: ['GET','POST'])]
+    public function edit(Request $request, Utilisateur $utilisateur, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $form = $this->createForm(UtilisateurType::class, $utilisateur);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $utilisateur->setPassword(
+                $passwordHasher->hashPassword($utilisateur, $utilisateur->getPassword()));
+            $this->getDoctrine()->getManager()->flush();
+
+            return $this->redirectToRoute('utilisateur_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->renderForm('utilisateur/edit.html.twig', [
+            'utilisateur' => $utilisateur,
+            'form' => $form,
+        ]);
+    }
+```
+Dans les paramètres de la fonction, on instancie un objet de la classe UserPasswordHasherInterface puis on fait appel à la fonction hashPassword de la même classe  
+dans la fonction setPassword de la classe Utilisateur, ainsi, ça hashera le mot de passe tout juste modifié.
+
+
+### B/
+
+En tant que personne malveillante, je veux avoir avoir accès à la base de données pour récupérer des informartions sur l'application Vetux-Line mais  
+aussi d'autres bases de données qui sont sur le même serveur que Vetux-Line.
+
+En tant que développeur, je vais créer sur le serveur de base de données  un utilisateur spécialement pour la base de données de Vetux-Line pour empêcher un utilisateur  
+malveillant d'accéder à cette base de données ainsi qu'à d'autre sur le même serveur. Pour cela sur phpMyAdmin je crée ce nouvel utilisateur comme ceci:
+
+![image](https://user-images.githubusercontent.com/78152264/140641626-46d75659-d71d-4a80-bedd-2287d71d665c.png)
+
+Et dans le fichier .env on précise les informations de la base de données avec cette ligne:
+
+```php
+    DATABASE_URL="mysql://vetux_line:wNgEf23m*7MZdWZ9@127.0.0.1:3306/vetux_line?serverVersion=mariadb-10.4.21"
+```
+
+### C/
+
+En tant que personne malveillante, je veux avoir accès à certaines pages sans authentification pour pouvoir avoir accès aux actions et aux données  
+permises à certains rôles.
+
+En tant que développeur, je veux autorisé seulement certains rôles à aller sur certaines pages pour éviter qu'un utilisateur malveillant ait accès aux actions et données  
+de ces rôles. Pour cela je modifie dans le fichier security.yaml les lignes de acces_control:
+
+```php
+access_control:
+         - { path: ^/utilisateur/admin, roles: ROLE_ADMIN }
+         - { path: ^/home, roles: ROLE_GESTIONNAIRE }
+```
+Ainsi, toutes les routes commençant par /utilisateur/admin seront uniquemant accessibles par les utilisateur avec le rôle ROLE_ADMIN et pareil pour  
+les routes commençant par /home pour les utilisateur avec le rôle ROLE_GESTIONNAIRE.  
+Par exemple, UtilisateurController.php a juste après ses uses et avant sa classe, il y a le nom de sa route:
+
+```php
+#[Route('/utilisateur')]
+class UtilisateurController extends AbstractController
+```
+Et dans les routes des admins, il y a /admin donc on retrouve bien /utilisateur/admin (voir la fonction du A/ pour exemple).  
+Pour /home, dans la UploadController.php là où il y a toute les fonctions des gestionnaires, on met:
+
+```php
+#[Route('/home')]
+class UploadController extends AbstractController
+```
+On retouve le /home .
+
+### D/
+
+En tant que personne malveillante, je veux uploader des fichiers pour faire planter le serveur ou le hacker.
+
+En tant que développeur, je veux seulement autoriser les fichiers csv dans l'upload pour éviter des attaques malveillantes. Pour cela je dois dans UploadController.php  
+dans la fonction index, vérifié le type de chaque fichier reçu par la fonction: 
+
+```php
+foreach ($files as $file)
+        {
+            $filetype = $file->getMimeType();
+            if (str_contains($filetype, '/csv')){
+                $filename = $file->getClientOriginalName();
+                $uploader->upload($uploadDir, $file, $filename);
+            }
+            else {
+                return $this->render('home/index.html.twig');
+            }
+        }
+```
+getMimeType() renvoie le type de fichier avec son extension sous forme: "type/extension".  
+Ici on vérifie juste si dans ce retour on a bien l'extension csv avec un str_contains et si oui on récupère le nom du fichier et on l'upload.  
+Sinon on renvoie à la page d'upload.  
+Nos fichiers csv ont comme MimeType application/csv et pas text/cvs, on a donc dû vérifier seulement l'extension.
+
+
+
 ## Conclusion
 
 Nous passons directement à la conclusion car nous n'avons pas pu réaliser le reste (les Evil User Stories seront terminés pour la semaine prochaine).  
@@ -1203,7 +1319,6 @@ Pourquoi n'avons nous pas finit le projet ?
 La principale raison est la mauvaise gestion du temps mais pas que, on a aussi eu des problèmes matérielle et des problèmes avec git qui nous on fait perdre beaucoup de temps.  
 Ensuite pendant la première semaine des vacances, c'était compliqué de travailler à cause de plusieurs facteurs personels et qui sont pas forcément prévus.  
 Ce qui nous a fait perdre encore plus de temps.  
-Tout cela aurait pû être éviter si nous avions mieux géré notre temps au début et nous en sommes conscients.  
-La semaine prochaines nous vous livrerons ce document mis à jour avec les Evil User Stories.
+Tout cela aurait pû être éviter si nous avions mieux géré notre temps au début et nous en sommes conscients.
 
 
