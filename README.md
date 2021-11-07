@@ -4,7 +4,7 @@
 **GONCALVES Maxence**  
 **Groupe: Le nain et l'échelle**
 
-[Ennoncé de la mission](https://ocapuozzo.github.io/mission-etl-csv/)  
+[Enoncé de la mission](https://ocapuozzo.github.io/mission-etl-csv/)  
 [Notre projet hébergé](https://github.com/GlobeTique77/Vetux-Line)
 
 30/10/2021
