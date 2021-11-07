@@ -48,9 +48,13 @@ class UploadController extends AbstractController
         foreach ($files as $file)
         {
             $filetype = $file->getMimeType();
-
-            $filename = $file->getClientOriginalName();
-            $uploader->upload($uploadDir, $file, $filename);
+            if (str_contains($filetype, '/csv')){
+                $filename = $file->getClientOriginalName();
+                $uploader->upload($uploadDir, $file, $filename);
+            }
+            else {
+                return $this->render('home/index.html.twig');
+            }
         }
         $this->addFlash('notice', 'Files uploaded');
         return $this->render('home/fusion.html.twig');
